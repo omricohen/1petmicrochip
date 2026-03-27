@@ -1,0 +1,17 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "1PetMicrochip",
+  "name_for_model": "pet_microchip_lookup",
+  "description_for_human": "Look up pet microchip numbers and register pets for free. Search across US, European, and UK databases.",
+  "description_for_model": "Look up pet microchip registration status. Use GET /api/lookup?chip=NUMBER to check if a 9-15 digit microchip number is registered. Returns pet info (name, species, breed) if found. Use GET /api/lookup/external?chip=NUMBER to get links to check international databases (AAHA US/Canada, Europetnet Europe, Check-a-Chip UK). Owner contact info is never returned.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://1petmicrochip.com/openapi.yaml"
+  },
+  "logo_url": "https://1petmicrochip.com/logo.png",
+  "contact_email": "support@1petmicrochip.com",
+  "legal_info_url": "https://1petmicrochip.com/about#terms"
+}

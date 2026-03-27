@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Pet {
+  id          String   @id @default(cuid())
+  microchipId String   @unique
+  name        String
+  species     String
+  breed       String?
+  color       String?
+  photoUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  owner       Owner    @relation(fields: [ownerId], references: [id])
+  ownerId     String
+  lookups     Lookup[]
+}
+
+model Owner {
+  id             String   @id @default(cuid())
+  name           String
+  email          String
+  phone          String
+  emergencyName  String?
+  emergencyPhone String?
+  magicToken     String   @unique @default(cuid())
+  pets           Pet[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Lookup {
+  id          String   @id @default(cuid())
+  petId       String?
+  microchipId String
+  foundInDb   String?
+  ip          String?
+  createdAt   DateTime @default(now())
+  pet         Pet?     @relation(fields: [petId], references: [id])
+}
+
+model ContactRequest {
+  id              String   @id @default(cuid())
+  microchipId     String
+  finderMessage   String
+  finderPhone     String?
+  finderEmail     String?
+  stripePaymentId String?
+  twilioMessageSid String?
+  status          String   @default("pending")
+  createdAt       DateTime @default(now())
+}

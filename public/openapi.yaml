@@ -1,0 +1,111 @@
+openapi: 3.0.0
+info:
+  title: 1PetMicrochip API
+  description: Free pet microchip registry and lookup service
+  version: 1.0.0
+servers:
+  - url: https://1petmicrochip.com
+paths:
+  /api/lookup:
+    get:
+      operationId: lookupMicrochip
+      summary: Look up a pet microchip number
+      description: Check if a microchip number is registered in the 1PetMicrochip database. Returns pet info if found.
+      parameters:
+        - name: chip
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Microchip number (9-15 digits)
+      responses:
+        "200":
+          description: Lookup result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  found:
+                    type: boolean
+                  pet:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      species:
+                        type: string
+                      breed:
+                        type: string
+                      color:
+                        type: string
+                      microchipId:
+                        type: string
+                  database:
+                    type: string
+  /api/lookup/external:
+    get:
+      operationId: lookupExternalDatabases
+      summary: Get links to external microchip databases
+      description: Returns links to check the microchip on AAHA, Europetnet, and Check-a-Chip databases.
+      parameters:
+        - name: chip
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Microchip number (9-15 digits)
+      responses:
+        "200":
+          description: External database links
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        database:
+                          type: string
+                        found:
+                          type: boolean
+                          nullable: true
+                        message:
+                          type: string
+                        url:
+                          type: string
+  /api/aaha/lookup:
+    get:
+      operationId: aahaLookup
+      summary: AAHA-compatible microchip lookup
+      description: Endpoint for AAHA Universal Pet Microchip Lookup integration
+      parameters:
+        - name: microchip_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Microchip number (9-15 digits)
+      responses:
+        "200":
+          description: AAHA lookup result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  found:
+                    type: boolean
+                  registry_name:
+                    type: string
+                  registry_url:
+                    type: string
+                  microchip_id:
+                    type: string
+                  species:
+                    type: string
+                  timestamp:
+                    type: string

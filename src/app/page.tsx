@@ -1,101 +1,169 @@
-import Image from "next/image";
+import { SearchBox } from "@/components/search-box";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import {
+  Shield,
+  DollarSign,
+  Globe,
+  PawPrint,
+  Heart,
+  Zap,
+} from "lucide-react";
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <>
+      {/* Hero */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/20" />
+        <div className="relative mx-auto max-w-6xl px-4 py-16 sm:py-24 text-center">
+          <Badge variant="success" className="mb-6 text-sm px-4 py-1.5">
+            🎉 Free Forever — No hidden fees
+          </Badge>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6">
+            Find Any Pet&apos;s{" "}
+            <span className="text-primary">Microchip</span>
+            <br className="hidden sm:block" /> in Seconds
+          </h1>
+
+          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
+            Search across US, European, and UK databases. Register your pet&apos;s
+            microchip for free. Help reunite lost pets with their families.
+          </p>
+
+          <SearchBox size="hero" />
+
+          <p className="mt-4 text-sm text-muted-foreground">
+            Searches 1PetMicrochip, AAHA, Europetnet, and Check-a-Chip databases
+          </p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+      </section>
+
+      {/* Features */}
+      <section className="mx-auto max-w-6xl px-4 py-16">
+        <h2 className="text-3xl font-bold text-center mb-12">
+          Why 1PetMicrochip?
+        </h2>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <FeatureCard
+            icon={<DollarSign className="h-6 w-6" />}
+            title="100% Free Registration"
+            description="Register your pet's microchip at no cost. No annual fees, no premium tiers. Free today, free forever."
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
+          <FeatureCard
+            icon={<Globe className="h-6 w-6" />}
+            title="Global Database Search"
+            description="One search checks AAHA (US/Canada), Europetnet (Europe), Check-a-Chip (UK), and our own growing database."
           />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
+          <FeatureCard
+            icon={<Shield className="h-6 w-6" />}
+            title="Privacy Protected"
+            description="Your contact info is never shown publicly. Found-pet contacts go through secure anonymous relay."
           />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <FeatureCard
+            icon={<Zap className="h-6 w-6" />}
+            title="Instant Lookup"
+            description="Enter any 9-15 digit microchip number and get results in seconds. No account needed to search."
+          />
+          <FeatureCard
+            icon={<Heart className="h-6 w-6" />}
+            title="Reunite Lost Pets"
+            description="Someone found your pet? For just $1, they can send you an anonymous message. You'll be connected instantly."
+          />
+          <FeatureCard
+            icon={<PawPrint className="h-6 w-6" />}
+            title="All Pets Welcome"
+            description="Dogs, cats, rabbits, birds, horses — if it has a microchip, we'll register it."
+          />
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="bg-muted/30 py-16">
+        <div className="mx-auto max-w-6xl px-4">
+          <h2 className="text-3xl font-bold text-center mb-12">
+            How It Works
+          </h2>
+          <div className="grid gap-8 sm:grid-cols-3">
+            <Step
+              number="1"
+              title="Look Up"
+              description="Enter the microchip number. We search our database and link you to major international registries."
+            />
+            <Step
+              number="2"
+              title="Register Free"
+              description="Not registered yet? Add your pet's info in under 2 minutes. It's free, forever."
+            />
+            <Step
+              number="3"
+              title="Get Reunited"
+              description="Found a chipped pet? Pay $1 to send the owner an anonymous message. No phone numbers shared."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="mx-auto max-w-6xl px-4 py-16 text-center">
+        <h2 className="text-3xl font-bold mb-4">
+          Protect Your Pet Today
+        </h2>
+        <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto">
+          Registration takes less than 2 minutes and it&apos;s completely free.
+          Give yourself peace of mind.
+        </p>
+        <Link href="/register">
+          <Button size="lg" className="text-lg px-10">
+            Register Your Pet Free →
+          </Button>
+        </Link>
+      </section>
+    </>
+  );
+}
+
+function FeatureCard({
+  icon,
+  title,
+  description,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}) {
+  return (
+    <Card className="transition-shadow hover:shadow-md">
+      <CardContent className="p-6">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary mb-4">
+          {icon}
+        </div>
+        <h3 className="font-semibold text-lg mb-2">{title}</h3>
+        <p className="text-sm text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
+  );
+}
+
+function Step({
+  number,
+  title,
+  description,
+}: {
+  number: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="text-center">
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground text-xl font-bold mb-4">
+        {number}
+      </div>
+      <h3 className="font-semibold text-lg mb-2">{title}</h3>
+      <p className="text-sm text-muted-foreground">{description}</p>
     </div>
   );
 }

@@ -1,0 +1,15 @@
+# 1PetMicrochip.com
+> Free pet microchip registry and lookup service.
+
+## API
+- GET /api/lookup?chip=XXXXXXXXXXXXXXX — Look up a microchip number. Returns registration status and pet info (name, species, breed). No auth required.
+- POST /api/register — Register a new pet microchip. Body: { microchipId, ownerName, ownerEmail, ownerPhone, petName, species, breed }
+- GET /api/lookup/external?chip=XXXXXXXXXXXXXXX — Get links to check external databases (AAHA, Europetnet, Check-a-Chip)
+- GET /api/aaha/lookup?microchip_id=XXXXXXXXXXXXXXX — AAHA-compatible lookup endpoint. Returns { found, registry_name, registry_url, species }
+
+## Info
+- Free forever for registration and lookup
+- $1 to contact pet owner (anonymous relay via SMS)
+- Covers US (AAHA), Europe (Europetnet), UK (Check-a-Chip) databases
+- Microchip numbers are 9-15 digits (ISO 11784/11785 standard)
+- Owner contact info is never exposed in API responses

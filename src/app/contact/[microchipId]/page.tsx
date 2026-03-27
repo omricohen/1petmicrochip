@@ -79,7 +79,7 @@ export default function ContactOwnerPage() {
             <div className="mx-auto mb-3 h-14 w-14 rounded-full bg-teal-100 flex items-center justify-center">
               <Heart className="h-7 w-7 text-teal-600" />
             </div>
-            <CardTitle className="text-2xl">Contact {petName ? `${petName}'s` : "Pet"} Owner</CardTitle>
+            <CardTitle className="text-2xl">Contact {petName ? `${petName}&#39;s` : "Pet"} Owner</CardTitle>
             <CardDescription>
               Send an anonymous message to help reunite this pet with their family.
               Your contact info is never shared — all communication goes through our secure relay.
@@ -94,7 +94,7 @@ export default function ContactOwnerPage() {
                 <Label htmlFor="message">Your message to the owner *</Label>
                 <Textarea
                   id="message"
-                  placeholder={`Hi! I think I found ${petName || "your pet"}. I'm at...`}
+                  placeholder={`Hi! I think I found ${petName || "your pet"}. I&apos;m at...`}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   rows={4}
@@ -135,7 +135,7 @@ export default function ContactOwnerPage() {
 
               <div className="flex items-start gap-2 text-xs text-muted-foreground">
                 <Shield className="h-4 w-4 mt-0.5 shrink-0 text-teal-600" />
-                <span>The owner's phone number is never revealed. All messages are relayed anonymously through our secure system.</span>
+                <span>The owner&apos;s phone number is never revealed. All messages are relayed anonymously through our secure system.</span>
               </div>
 
               <Button type="submit" className="w-full h-12 text-base bg-teal-600 hover:bg-teal-700" disabled={submitting || !petName}>

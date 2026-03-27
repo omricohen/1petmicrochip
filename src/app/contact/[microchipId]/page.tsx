@@ -1,37 +1,34 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { MessageSquare, Shield, CreditCard, Heart } from "lucide-react";
+import { MessageSquare, Shield, CreditCard, Heart, Loader2 } from "lucide-react";
 
 export default function ContactOwnerPage() {
   const params = useParams();
-  const router = useRouter();
+  const searchParams = useSearchParams();
   const microchipId = params.microchipId as string;
+  const cancelled = searchParams.get("cancelled");
 
-  const [step, setStep] = useState<"message" | "payment" | "sending">("message");
   const [petName, setPetName] = useState("");
   const [message, setMessage] = useState("");
   const [finderPhone, setFinderPhone] = useState("");
   const [finderEmail, setFinderEmail] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(cancelled ? "Payment was cancelled. You can try again." : "");
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    // Verify pet exists
     fetch(`/api/lookup?chip=${microchipId}`)
       .then((r) => r.json())
       .then((data) => {
-        if (data.found) {
-          setPetName(data.pet.name);
-        } else {
-          setError("This microchip is not registered in our database.");
-        }
+        if (data.found) setPetName(data.pet.name);
+        else setError("This microchip is not registered in our database.");
       })
       .catch(() => setError("Failed to look up this microchip."))
       .finally(() => setLoading(false));
@@ -43,180 +40,115 @@ export default function ContactOwnerPage() {
       setError("Please enter a message for the pet owner.");
       return;
     }
-    setStep("sending");
+    setSubmitting(true);
     setError("");
 
     try {
-      // Create payment intent
-      const payRes = await fetch("/api/stripe/create-payment-intent", {
+      const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ microchipId }),
+        body: JSON.stringify({ microchipId, message: message.trim(), finderPhone, finderEmail }),
       });
 
-      if (!payRes.ok) {
-        const payData = await payRes.json();
-        setError(payData.error || "Payment setup failed");
-        setStep("message");
-        return;
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setError(data.error || "Payment setup failed. Please try again.");
+        setSubmitting(false);
       }
-
-      // In production, this would use Stripe Elements for card input.
-      // For now, we simulate a successful payment and send the contact.
-      const payData = await payRes.json();
-
-      // Send contact message
-      const contactRes = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          microchipId,
-          message: message.trim(),
-          finderPhone,
-          finderEmail,
-          paymentIntentId: payData.clientSecret?.split("_secret_")[0],
-        }),
-      });
-
-      if (!contactRes.ok) {
-        const contactData = await contactRes.json();
-        setError(contactData.error || "Failed to send message");
-        setStep("message");
-        return;
-      }
-
-      router.push("/contact/success");
     } catch {
       setError("Something went wrong. Please try again.");
-      setStep("message");
+      setSubmitting(false);
     }
   };
 
   if (loading) {
     return (
-      <div className="text-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4" />
-        <p className="text-muted-foreground">Loading...</p>
-      </div>
-    );
-  }
-
-  if (error && !petName) {
-    return (
-      <div className="mx-auto max-w-xl px-4 py-16 text-center">
-        <h1 className="text-2xl font-bold mb-4">Pet Not Found</h1>
-        <p className="text-muted-foreground">{error}</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-xl px-4 py-10">
-      <div className="text-center mb-8">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
-          <Heart className="h-8 w-8 text-primary" />
-        </div>
-        <h1 className="text-2xl font-bold mb-2">
-          Help Reunite {petName} With Their Owner
-        </h1>
-        <p className="text-muted-foreground">
-          Send an anonymous message to the registered owner for just $1
-        </p>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <MessageSquare className="h-5 w-5 text-primary" />
-            Contact the Owner
-          </CardTitle>
-          <CardDescription className="flex items-center gap-2">
-            <Shield className="h-3 w-3" />
-            The owner&apos;s contact info stays private. Your message is relayed anonymously.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <Label htmlFor="message">Your Message *</Label>
-              <Textarea
-                id="message"
-                placeholder={`Hi! I think I found ${petName}. I'm at...`}
-                value={message}
-                onChange={(e) => {
-                  setMessage(e.target.value);
-                  setError("");
-                }}
-                rows={4}
-                required
-                className="mt-1"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Include your location and how they can reach you
-              </p>
+    <div className="min-h-screen bg-gradient-to-b from-teal-50 to-white py-12 px-4">
+      <div className="max-w-lg mx-auto">
+        <Card className="shadow-lg">
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-3 h-14 w-14 rounded-full bg-teal-100 flex items-center justify-center">
+              <Heart className="h-7 w-7 text-teal-600" />
             </div>
-
-            <div>
-              <Label htmlFor="finderPhone">Your Phone (optional)</Label>
-              <Input
-                id="finderPhone"
-                type="tel"
-                placeholder="+1 (555) 123-4567"
-                value={finderPhone}
-                onChange={(e) => setFinderPhone(e.target.value)}
-                className="mt-1"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="finderEmail">Your Email (optional)</Label>
-              <Input
-                id="finderEmail"
-                type="email"
-                placeholder="your@email.com"
-                value={finderEmail}
-                onChange={(e) => setFinderEmail(e.target.value)}
-                className="mt-1"
-              />
-            </div>
-
+            <CardTitle className="text-2xl">Contact {petName ? `${petName}'s` : "Pet"} Owner</CardTitle>
+            <CardDescription>
+              Send an anonymous message to help reunite this pet with their family.
+              Your contact info is never shared — all communication goes through our secure relay.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
             {error && (
-              <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-lg">
-                {error}
-              </div>
+              <div className="mb-4 p-3 rounded-lg bg-red-50 text-red-700 text-sm">{error}</div>
             )}
-
-            <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span>Contact fee</span>
-                <span className="font-semibold">$1.00</span>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="message">Your message to the owner *</Label>
+                <Textarea
+                  id="message"
+                  placeholder={`Hi! I think I found ${petName || "your pet"}. I'm at...`}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  rows={4}
+                  required
+                />
               </div>
-              <p className="text-xs text-muted-foreground">
-                This small fee helps keep registrations free for everyone and prevents spam.
-              </p>
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone">Your phone number (optional)</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  placeholder="+1 (555) 123-4567"
+                  value={finderPhone}
+                  onChange={(e) => setFinderPhone(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Your email (optional)</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={finderEmail}
+                  onChange={(e) => setFinderEmail(e.target.value)}
+                />
+              </div>
 
-            <Button
-              type="submit"
-              size="lg"
-              className="w-full gap-2"
-              disabled={step === "sending"}
-            >
-              {step === "sending" ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                  Sending...
-                </>
-              ) : (
-                <>
-                  <CreditCard className="h-5 w-5" />
-                  Pay $1 & Send Message
-                </>
-              )}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+              <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <CreditCard className="h-4 w-4 text-teal-600" />
+                  <span>$1.00 — Pet Reunification Fee</span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  This small fee covers the cost of sending an anonymous SMS to the pet owner.
+                  100% of proceeds go toward keeping this registry free for everyone.
+                </p>
+              </div>
+
+              <div className="flex items-start gap-2 text-xs text-muted-foreground">
+                <Shield className="h-4 w-4 mt-0.5 shrink-0 text-teal-600" />
+                <span>The owner's phone number is never revealed. All messages are relayed anonymously through our secure system.</span>
+              </div>
+
+              <Button type="submit" className="w-full h-12 text-base bg-teal-600 hover:bg-teal-700" disabled={submitting || !petName}>
+                {submitting ? (
+                  <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Redirecting to payment...</>
+                ) : (
+                  <><MessageSquare className="h-4 w-4 mr-2" /> Pay $1 & Send Message</>
+                )}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
